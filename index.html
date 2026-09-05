@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="종이 평가지를 숫자로 빠르게 입력해 조별 평균과 1등 조를 뽑는 채점판">
+<meta name="color-scheme" content="light dark">
+<title>조별 루트 세팅 채점판</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%A7%97%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+  /* 아티팩트 런타임이 제공하던 최소 리셋 — display:flex 가 [hidden] 을 덮지 않도록 !important 필수 */
+  html { -webkit-text-size-adjust: 100%; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap">
+<style>
+  :root {
+    --ground: #FAF6F1;
+    --surface: #FFFFFF;
+    --soft: #FBEAE7;
+    --brand: #C0392B;
+    --brand-deep: #7A2419;
+    --ink: #2B2522;
+    --muted: #9C8E86;
+    --line: #EAE2DC;
+    --line-strong: #DCD2CA;
+    --star: #E0902A;
+    --star-off: #DED5CE;
+    --shadow: 0 1px 2px rgba(43,37,34,.05), 0 12px 28px rgba(122,36,25,.07);
+    --r: 14px;
+    --tape-1: #C0392B;
+    --tape-2: #D9963B;
+    --tape-3: #6E8B4B;
+    --tape-4: #2F7A82;
+    --tape-5: #7D4A76;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #1B1715; --surface: #241F1D; --soft: #33231F;
+      --brand: #E4664F; --brand-deep: #F0A292;
+      --ink: #F2EDE8; --muted: #A99B93;
+      --line: #38302C; --line-strong: #4A403B;
+      --star: #F0AC46; --star-off: #453B36;
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 28px rgba(0,0,0,.35);
+      --tape-1: #E4664F; --tape-2: #E8B15C; --tape-3: #90AF69;
+      --tape-4: #4EA1A9; --tape-5: #A46E9C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #1B1715; --surface: #241F1D; --soft: #33231F;
+    --brand: #E4664F; --brand-deep: #F0A292;
+    --ink: #F2EDE8; --muted: #A99B93;
+    --line: #38302C; --line-strong: #4A403B;
+    --star: #F0AC46; --star-off: #453B36;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 28px rgba(0,0,0,.35);
+    --tape-1: #E4664F; --tape-2: #E8B15C; --tape-3: #90AF69;
+    --tape-4: #4EA1A9; --tape-5: #A46E9C;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Noto Sans KR", system-ui, -apple-system, "Malgun Gothic", sans-serif;
+    font-size: 15px; line-height: 1.6; -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 40px; }
+
+  header.top { display: flex; align-items: flex-start; gap: 14px; padding: 26px 0 0; }
+  header.top .ttl { flex: 1; }
+  h1 {
+    font-family: "Outfit", "Noto Sans KR", sans-serif;
+    font-weight: 700; font-size: 26px; line-height: 1.25; letter-spacing: -.01em;
+    margin: 0; color: var(--brand-deep); text-wrap: balance;
+  }
+  header.top .sub { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+
+  .howto {
+    background: var(--soft); border: 1px solid rgba(192,57,43,.16);
+    border-radius: var(--r); padding: 14px 16px; margin-top: 18px;
+  }
+  .howto h2 {
+    font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--brand-deep);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .howto ol { margin: 0; padding-left: 17px; font-size: 13px; color: var(--brand-deep); line-height: 1.85; }
+  .howto b { font-weight: 700; }
+
+  .steps { display: flex; gap: 8px; margin: 18px 0 0; flex-wrap: wrap; }
+  .steps button {
+    appearance: none; cursor: pointer; font: inherit; font-size: 14px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); color: var(--muted);
+    border: 1px solid var(--line-strong); border-radius: 999px; padding: 9px 16px 9px 9px;
+    flex: 1; justify-content: center;
+  }
+  .steps button .n {
+    font-family: "Outfit", sans-serif; font-weight: 700; font-size: 12px;
+    width: 21px; height: 21px; border-radius: 50%; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--line); color: var(--muted);
+  }
+  .steps button[aria-selected="true"] {
+    background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700;
+  }
+  .steps button[aria-selected="true"] .n { background: rgba(255,255,255,.24); color: #fff; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+
+  main { padding-top: 16px; }
+  section.pane { display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 17px; }
+  .card h2.ch { font-size: 16px; font-weight: 700; margin: 0 0 3px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 0; }
+
+  /* 진행 */
+  .counter { display: flex; align-items: center; gap: 14px; }
+  .counter .big {
+    font-family: "Outfit", sans-serif; font-size: 30px; font-weight: 700; line-height: 1;
+    color: var(--brand); font-variant-numeric: tabular-nums;
+  }
+  .counter .big small { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .counter .txt { flex: 1; font-size: 13px; color: var(--muted); }
+  .counter .txt.over { color: var(--brand); font-weight: 700; }
+  .bar { height: 7px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 7px; }
+  .bar > i { display: block; height: 100%; background: var(--brand); transition: width .25s ease; }
+  @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+
+  /* 입력 시트 */
+  .sheet-hd {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line-strong);
+  }
+  .sheet-hd .no { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .sheet-hd .spacer { flex: 1; }
+  .sheet-hd .cnt { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .tgroup { margin-top: 14px; }
+  .tgroup:first-child { margin-top: 0; }
+  .tgroup > .gh {
+    display: flex; align-items: center; gap: 8px; margin: 0 0 6px 2px;
+  }
+  .tgroup > .gh i { width: 16px; height: 7px; border-radius: 2px; background: var(--tape); }
+  .tgroup > .gh span { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+
+  .qrow {
+    display: flex; align-items: center; gap: 12px; justify-content: space-between;
+    padding: 7px 4px 7px 6px; border-radius: 10px; flex-wrap: wrap;
+  }
+  .qrow .qt { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; flex: 1; min-width: 110px; }
+  .cardhead { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+  .cardhead .btn { flex: none; }
+  .counter .big input[type="number"] {
+    width: 54px; padding: 3px 6px; font-size: 13px; font-weight: 600; text-align: center;
+    border-radius: 7px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink);
+    -moz-appearance: textfield;
+  }
+  .counter .big input::-webkit-outer-spin-button, .counter .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .qrow .sbox {
+    flex: none; width: 64px; height: 46px; text-align: center;
+    font-family: "Outfit", "Noto Sans KR", sans-serif; font-size: 20px; font-weight: 700;
+    color: var(--ink); background: var(--ground);
+    border: 1.5px solid var(--line-strong); border-radius: 10px; padding: 0;
+    -moz-appearance: textfield; caret-color: var(--brand);
+  }
+  .qrow .sbox::-webkit-outer-spin-button, .qrow .sbox::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .qrow .sbox:focus { outline: none; border-color: var(--brand); background: var(--soft); box-shadow: 0 0 0 3px rgba(192,57,43,.13); }
+  .qrow .sbox.filled { border-color: var(--brand); color: var(--brand); background: var(--surface); }
+
+  /* 지난 평가지 */
+  .sheetchips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sheetchips button {
+    appearance: none; cursor: pointer; font-family: "Outfit", "Noto Sans KR", sans-serif;
+    font-size: 13px; font-weight: 600; padding: 7px 11px; border-radius: 9px;
+    background: var(--ground); border: 1px solid var(--line-strong); color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .sheetchips button:hover { border-color: var(--brand); color: var(--brand); }
+  .sheetchips button.editing { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .sheetchips button small { color: var(--muted); font-weight: 500; margin-left: 5px; }
+  .sheetchips button.editing small { color: rgba(255,255,255,.8); }
+  .editing-tag {
+    font-size: 12px; font-weight: 700; color: #fff; background: var(--brand);
+    border-radius: 20px; padding: 3px 10px;
+  }
+
+  .savebar {
+    position: sticky; bottom: 0; z-index: 5; margin-top: 2px;
+    background: linear-gradient(to top, var(--ground) 60%, transparent);
+    padding: 12px 0 10px; display: flex; gap: 10px;
+  }
+  .btn {
+    appearance: none; cursor: pointer; font: inherit; font-weight: 700; font-size: 16px;
+    background: var(--brand); color: #fff; border: 1px solid transparent;
+    border-radius: 12px; padding: 15px 20px;
+  }
+  .btn:disabled { opacity: .38; cursor: not-allowed; }
+  .btn.wide { flex: 1; }
+  .btn.ghost { background: var(--surface); color: var(--ink); border-color: var(--line-strong); font-weight: 500; }
+  .btn.sm { padding: 9px 14px; font-size: 13px; border-radius: 9px; font-weight: 500; }
+  .btn.danger { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.armed { background: var(--brand); color: #fff; border-color: var(--brand); font-weight: 700; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .row.end { justify-content: flex-end; }
+
+  /* 결과 */
+  .winner {
+    background: var(--brand); color: #fff; border-radius: var(--r);
+    padding: 24px 22px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .winner .k {
+    font-family: "Outfit", sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase; opacity: .8;
+  }
+  .winner .nm { font-size: 34px; font-weight: 700; line-height: 1.15; margin: 5px 0 4px; }
+  .winner .sc { font-family: "Outfit", sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .winner .sc span { opacity: .78; font-size: 13px; font-weight: 500; }
+  .heroes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .heroes { grid-template-columns: 1fr; } }
+
+  /* 문제 1등은 같은 골격에 색만 반전 — 조 1등이 주인공이라는 위계를 유지한다. */
+  .winner.alt {
+    background: var(--surface); color: var(--ink);
+    border: 2px solid var(--brand); padding: 22px 20px;
+  }
+  .winner.alt .k { color: var(--brand); opacity: 1; }
+  .winner.alt .nm { font-size: 22px; }
+  .winner.alt .sc { color: var(--brand); }
+  .winner.alt .sc span { color: var(--muted); opacity: 1; }
+  .winner .sub2 { margin-top: 7px; font-size: 12.5px; opacity: .8; }
+  .winner.alt .sub2 { color: var(--muted); opacity: 1; }
+
+  .seclabel {
+    display: flex; align-items: baseline; gap: 9px; margin: 4px 2px 9px; flex-wrap: wrap;
+  }
+  .seclabel b { font-size: 15px; font-weight: 700; }
+  .seclabel span { font-size: 12px; color: var(--muted); }
+
+  .best-tag {
+    font-size: 11px; font-weight: 700; color: #fff; background: var(--brand);
+    border-radius: 20px; padding: 2px 9px; margin-left: 7px; vertical-align: 2px;
+  }
+  .rank-row.best { border-color: var(--brand); box-shadow: var(--shadow); }
+  .rank { display: flex; flex-direction: column; gap: 8px; }
+  .rank-row {
+    display: grid; grid-template-columns: 24px 1fr auto; gap: 12px; align-items: center;
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 5px solid var(--tape); border-radius: var(--r); padding: 13px 15px;
+  }
+  .rank-row .no { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rank-row .nm { font-weight: 700; }
+  .rank-row .detail { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rank-row .score b { font-family: "Outfit", sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-row .score span { color: var(--muted); font-size: 12px; }
+
+  details.more > summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--muted); }
+  details.more[open] > summary { margin-bottom: 12px; color: var(--ink); }
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { font-family: "Outfit", sans-serif; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "Outfit", "Noto Sans KR", sans-serif; }
+  td .tapecell { display: inline-flex; align-items: center; gap: 7px; }
+  td .tapecell i { width: 9px; height: 9px; border-radius: 2px; background: var(--tape); }
+
+  .notice {
+    border: 1px solid rgba(192,57,43,.2); background: var(--soft);
+    border-radius: 10px; padding: 11px 13px; font-size: 13px; color: var(--brand-deep);
+  }
+  .empty { color: var(--muted); font-size: 14px; padding: 22px 2px; text-align: center; }
+
+  .toast {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 648px; margin: 0 auto;
+    background: var(--brand-deep); color: #FFF6F3; border-radius: 12px;
+    padding: 13px 15px; font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); z-index: 40;
+  }
+  .toast .spacer { flex: 1; }
+  .toast button {
+    appearance: none; font: inherit; font-weight: 700; font-size: 13px; cursor: pointer;
+    background: transparent; color: inherit; border: 1px solid currentColor;
+    border-radius: 8px; padding: 6px 12px;
+  }
+
+  input[type="text"], input[type="number"] {
+    width: 100%; font: inherit; color: var(--ink); background: var(--ground);
+    border: 1px solid var(--line-strong); border-radius: 9px; padding: 10px 12px;
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="ttl">
+      <h1>조별 루트 세팅 채점판</h1>
+      <p class="sub">5개 조 · 조당 2문제 · 5점 만점 (0.5점 단위)</p>
+    </div>
+  </header>
+
+  <div class="howto">
+    <h2>사용 방법 (3단계)</h2>
+    <ol>
+      <li><b>평가지 입력</b> — 종이 한 장을 보고 문제마다 점수를 칩니다. <b>0.5 ~ 5</b>, 반 점은 <b>4.5</b>처럼 소수점까지 치면 됩니다. 다음 숫자를 치면 자동으로 다음 칸으로 넘어가고, 빈 문제는 건너뜁니다.</li>
+      <li><b>저장하고 다음 장</b> — 누르면 화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣었으면 아래 <b>입력한 평가지</b>에서 번호를 눌러 다시 고칩니다.</li>
+      <li><b>결과</b> — 마지막 장을 넣는 순간 조 1등과 문제 1등이 나옵니다.</li>
+    </ol>
+  </div>
+
+  <nav class="steps" role="tablist">
+    <button role="tab" data-tab="input" aria-selected="true"><span class="n">1</span>평가지 입력</button>
+    <button role="tab" data-tab="result" aria-selected="false"><span class="n">2</span>결과</button>
+  </nav>
+
+  <main>
+    <!-- ============ 입력 ============ -->
+    <section class="pane" id="pane-input">
+      <div id="storeNotice"></div>
+
+      <div class="card">
+        <div class="counter">
+          <div class="big"><span id="cntDone">0</span><small> / <input type="number" id="cntTarget" min="1" max="200" step="1" aria-label="전체 평가지 장수">장</small></div>
+          <div class="txt">
+            <span id="cntMsg">첫 번째 평가지를 입력하세요.</span>
+            <div class="bar"><i id="cntBar" style="width:0%"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sheet-hd">
+          <span class="no" id="sheetNo">평가지 #1</span>
+          <span class="spacer"></span>
+          <span class="cnt" id="sheetCnt">0 / 10 입력</span>
+        </div>
+        <p class="hint" id="kbHint" style="margin-bottom:12px">0.5점 단위 · <b>4</b>는 4점, <b>4.5</b>는 4.5점 · 다음 숫자를 치면 다음 칸으로 · 건너뛰기 <b>↓</b> · 저장 <b>Enter</b></p>
+        <div id="qList"></div>
+      </div>
+
+      <div class="savebar">
+        <button class="btn ghost sm" id="clearBtn" style="flex:none">비우기</button>
+        <button class="btn ghost sm" id="cancelEditBtn" style="flex:none" hidden>수정 취소</button>
+        <button class="btn danger sm" id="deleteEditBtn" style="flex:none" hidden>이 장 삭제</button>
+        <button class="btn wide" id="saveBtn" disabled>점수를 입력해주세요</button>
+      </div>
+
+      <div class="card" id="pastCard" hidden>
+        <div class="cardhead">
+          <div>
+            <h2 class="ch">입력한 평가지</h2>
+            <p class="hint">번호를 누르면 그 장을 다시 불러와 고칠 수 있습니다.</p>
+          </div>
+          <button class="btn danger sm" id="resetAll">전체 초기화</button>
+        </div>
+        <div class="sheetchips" id="sheetChips" style="margin-top:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 결과 ============ -->
+    <section class="pane" id="pane-result" hidden>
+      <div class="heroes" id="resultTop"></div>
+
+      <div id="teamBlock" hidden>
+        <div class="seclabel"><b>조 순위</b><span>각 조 2문제 평균의 평균</span></div>
+        <div class="rank" id="rankList"></div>
+      </div>
+
+      <div id="probBlock" hidden>
+        <div class="seclabel"><b>문제 순위</b><span>10문제 전체, 평균 높은 순</span></div>
+        <div class="rank" id="probRank"></div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <div>
+            <h2 class="ch">결과 내려받기</h2>
+            <p class="hint">조 순위와 문제별 평균·점수 분포가 한 파일에 들어갑니다.</p>
+          </div>
+          <button class="btn ghost sm" id="csvBtn">CSV 내보내기</button>
+        </div>
+        <div id="csvOut"></div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TAPE_VARS = ["var(--tape-1)", "var(--tape-2)", "var(--tape-3)", "var(--tape-4)", "var(--tape-5)"];
+
+  function defaultConfig() {
+    var teams = [];
+    for (var i = 1; i <= 5; i++) {
+      teams.push({
+        id: "t" + i, name: i + "조",
+        problems: [
+          { id: "t" + i + "p1", name: i + "조 1번 문제" },
+          { id: "t" + i + "p2", name: i + "조 2번 문제" }
+        ]
+      });
+    }
+    return { teams: teams, target: 30 };
+  }
+
+  var LS_CFG = "climb_cfg_v3", LS_SHEETS = "climb_sheets_v3";
+
+  var IN_ARTIFACT = !!(window.claude && typeof window.claude.use === "function");
+  var db = null, downloads = null;
+  var config = defaultConfig();
+  var sheets = {};              // id -> {scores:{pid:1~5}, at}
+  var draft = {};               // pid -> 점수
+  var editingId = null;         // 지난 장을 고치는 중이면 그 문서 id
+  var tab = "input", storeMode = "loading";
+
+  function lsGet(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function newId() { return "s-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function esc(s) {
+    return String(s === undefined || s === null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function fmt(n, d) { return (n === null || n === undefined) ? "–" : Number(n).toFixed(d === undefined ? 2 : d); }
+  function tapeOf(i) { return TAPE_VARS[i % TAPE_VARS.length]; }
+
+  function allProblems() {
+    var out = [];
+    config.teams.forEach(function (t, ti) {
+      (t.problems || []).forEach(function (p) { out.push({ id: p.id, name: p.name, team: t, tape: tapeOf(ti) }); });
+    });
+    return out;
+  }
+
+  /* ---------- 집계 ---------- */
+  // 0.5점 단위 — 0.5 ~ 5.0, 분포는 10칸(0.5,1,…,5)
+  function isScore(v) {
+    return typeof v === "number" && isFinite(v) && v >= 0.5 && v <= 5
+      && Math.abs(v * 2 - Math.round(v * 2)) < 1e-9;
+  }
+  function zeros(n) { var a = []; for (var i = 0; i < n; i++) a.push(0); return a; }
+  function scoreText(v) { return (Math.round(v * 2) / 2).toString(); }
+
+  function problemStats() {
+    var map = {};
+    allProblems().forEach(function (p) { map[p.id] = { problem: p, sum: 0, n: 0, dist: zeros(10), avg: null }; });
+    Object.keys(sheets).forEach(function (id) {
+      var sc = (sheets[id] || {}).scores || {};
+      Object.keys(sc).forEach(function (pid) {
+        var c = map[pid], v = Number(sc[pid]);
+        if (!c || !isScore(v)) return;
+        c.sum += v; c.n += 1; c.dist[Math.round(v * 2) - 1] += 1;
+      });
+    });
+    Object.keys(map).forEach(function (k) { var c = map[k]; c.avg = c.n ? c.sum / c.n : null; });
+    return map;
+  }
+
+  function teamStats() {
+    var pm = problemStats();
+    var rows = config.teams.map(function (t, ti) {
+      var probs = (t.problems || []).map(function (p) { return pm[p.id]; }).filter(Boolean);
+      var scored = probs.filter(function (c) { return c.avg !== null; });
+      var avg = scored.length ? scored.reduce(function (a, c) { return a + c.avg; }, 0) / scored.length : null;
+      return { team: t, tape: tapeOf(ti), probs: probs, avg: avg, votes: probs.reduce(function (a, c) { return a + c.n; }, 0) };
+    });
+    rows.sort(function (a, b) {
+      if (a.avg === null && b.avg === null) return 0;
+      if (a.avg === null) return 1;
+      if (b.avg === null) return -1;
+      if (b.avg !== a.avg) return b.avg - a.avg;
+      return b.votes - a.votes;
+    });
+    var rank = 0, prev = null;
+    rows.forEach(function (r, i) {
+      if (r.avg === null) { r.rank = null; return; }
+      if (prev === null || Math.abs(r.avg - prev) > 1e-9) rank = i + 1;
+      r.rank = rank; prev = r.avg;
+    });
+    return rows;
+  }
+
+  /* ---------- 저장 ---------- */
+  function persistLocal() { lsSet(LS_SHEETS, sheets); }
+
+  function addSheet(body) {
+    var id = newId();
+    sheets[id] = body;
+    render();
+    if (db) db.doc("sheets/" + id).set(body).catch(onStoreError);
+    else persistLocal();
+    return id;
+  }
+  function putSheet(id, body) {
+    sheets[id] = body;
+    render();
+    if (db) db.doc("sheets/" + id).set(body).catch(onStoreError);
+    else persistLocal();
+  }
+  // 저장 순서대로 번호를 매긴다 — 종이 더미 순서와 화면 번호를 맞추기 위해.
+  function orderedSheets() {
+    return Object.keys(sheets).sort(function (a, b) {
+      var x = (sheets[a] || {}).at || "", y = (sheets[b] || {}).at || "";
+      return x === y ? (a < b ? -1 : 1) : (x < y ? -1 : 1);
+    });
+  }
+  function sheetNoOf(id) { return orderedSheets().indexOf(id) + 1; }
+  function dropSheet(id) {
+    delete sheets[id];
+    render();
+    if (db) db.doc("sheets/" + id).delete().catch(onStoreError);
+    else persistLocal();
+  }
+  function saveConfig() {
+    if (db) db.doc("config/main").set({ teams: config.teams, target: config.target, updatedAt: new Date().toISOString() }).catch(onStoreError);
+    else lsSet(LS_CFG, config);
+    render();
+  }
+  function onStoreError(e) {
+    var code = (e && e.code) || "unknown";
+    toast(code === "quota_exceeded" ? "저장 공간이 가득 찼습니다. 설정에서 이전 데이터를 지워주세요."
+        : code === "resource_exhausted" ? "입력이 너무 빠릅니다. 잠시 후 다시 눌러주세요."
+        : code === "revoked" || code === "not_granted" ? "공유 저장 권한이 끊겼습니다. 새로고침해 주세요."
+        : "저장하지 못했습니다 (" + code + ").");
+  }
+
+  var toastEl = null, toastTimer = null;
+  function toast(msg, actionLabel, action) {
+    if (toastEl) toastEl.remove();
+    toastEl = document.createElement("div");
+    toastEl.className = "toast";
+    toastEl.innerHTML = "<span>" + esc(msg) + '</span><span class="spacer"></span>';
+    if (actionLabel) {
+      var b = document.createElement("button");
+      b.textContent = actionLabel;
+      b.onclick = function () { action(); if (toastEl) { toastEl.remove(); toastEl = null; } };
+      toastEl.appendChild(b);
+    }
+    document.body.appendChild(toastEl);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { if (toastEl) { toastEl.remove(); toastEl = null; } }, 5000);
+  }
+
+  /* ---------- 렌더 ---------- */
+  function render() { renderNotice(); renderCounter(); renderSheet(); renderPast(); renderResult(); }
+
+  function renderNotice() {
+    var el = document.getElementById("storeNotice");
+    if (storeMode !== "local") { el.innerHTML = ""; return; }
+    // 웹사이트로 열었을 땐 기기 저장이 정상 동작이라 경고가 아니라 안내로 적는다.
+    el.innerHTML = IN_ARTIFACT
+      ? '<div class="notice">공유 저장소에 연결하지 못했습니다. 입력한 평가지는 <b>이 기기에만</b> 저장되니 한 기기에서 끝까지 입력해 주세요.</div>'
+      : '<p class="hint" style="margin:0 2px">입력한 평가지는 <b>이 브라우저에</b> 저장됩니다. 새로고침해도 남지만 다른 기기·시크릿창에서는 보이지 않습니다.</p>';
+  }
+
+  function renderCounter() {
+    var done = Object.keys(sheets).length, target = config.target || 30;
+    document.getElementById("cntDone").textContent = done;
+    var tg = document.getElementById("cntTarget");
+    if (document.activeElement !== tg) tg.value = target;
+    document.getElementById("cntBar").style.width = Math.min(100, target ? (done / target * 100) : 0) + "%";
+    document.getElementById("cntMsg").textContent =
+      done === 0 ? "첫 번째 평가지를 입력하세요."
+      : done > target ? "목표 " + target + "장보다 " + (done - target) + "장 더 들어갔습니다. 확인해 주세요."
+      : done === target ? "다 들어왔습니다. 결과에서 1등 조를 확인하세요."
+      : (target - done) + "장 남았습니다.";
+    document.querySelector(".counter .txt").classList.toggle("over", done > target);
+  }
+
+  // 입력 칸은 타이핑 중 다시 그리면 포커스가 날아가므로, 목록이 바뀔 때만 새로 만든다.
+  var sheetKey = null;
+  function renderSheet() {
+    var probs = allProblems();
+    var key = probs.map(function (p) { return p.id + ":" + p.name + ":" + p.team.name; }).join("|");
+    var list = document.getElementById("qList");
+    if (key !== sheetKey && !list.contains(document.activeElement)) {
+      sheetKey = key;
+      var html = "", lastTeam = null;
+      probs.forEach(function (p) {
+        if (p.team.id !== lastTeam) {
+          if (lastTeam !== null) html += "</div>";
+          lastTeam = p.team.id;
+          html += '<div class="tgroup" style="--tape:' + p.tape + '"><div class="gh"><i></i><span>'
+               + esc(p.team.name) + " 세팅</span></div>";
+        }
+        html += '<div class="qrow"><label class="qt" for="in-' + esc(p.id) + '">' + esc(p.name) + "</label>"
+             + '<input class="sbox" id="in-' + esc(p.id) + '" data-pid="' + esc(p.id) + '" type="text"'
+             + ' inputmode="decimal" autocomplete="off" placeholder="–"'
+             + ' aria-label="' + esc(p.name) + ' 점수, 0.5에서 5, 0.5 단위"'
+             + ' value="' + (draft[p.id] ? scoreText(draft[p.id]) : "") + '"></div>';
+      });
+      if (lastTeam !== null) html += "</div>";
+      list.innerHTML = html;
+    }
+    syncBoxes();
+    updateSheetMeta();
+  }
+
+  function syncBoxes() {
+    document.querySelectorAll("#qList input[data-pid]").forEach(function (inp) {
+      var v = draft[inp.dataset.pid];
+      if (document.activeElement !== inp) inp.value = v ? scoreText(v) : "";
+      inp.dataset.prev = inp.value;
+      inp.classList.toggle("filled", !!v);
+    });
+  }
+
+  function updateSheetMeta() {
+    var probs = allProblems();
+    var filled = probs.filter(function (p) { return draft[p.id]; }).length;
+    var editing = editingId && sheets[editingId];
+    document.getElementById("sheetNo").innerHTML = editing
+      ? "평가지 #" + sheetNoOf(editingId) + ' <span class="editing-tag">수정 중</span>'
+      : "평가지 #" + (Object.keys(sheets).length + 1);
+    document.getElementById("sheetCnt").textContent = filled + " / " + probs.length + " 입력";
+    document.getElementById("cancelEditBtn").hidden = !editing;
+    var delBtn = document.getElementById("deleteEditBtn");
+    if (!editing && armedBtn === delBtn) disarm();
+    delBtn.hidden = !editing;
+    var btn = document.getElementById("saveBtn");
+    btn.disabled = filled === 0;
+    btn.textContent = filled === 0 ? "점수를 입력해주세요"
+      : editing ? "수정 저장 (" + filled + "문제)"
+      : "저장하고 다음 장 (" + filled + "문제)";
+  }
+
+  function renderPast() {
+    var order = orderedSheets();
+    document.getElementById("pastCard").hidden = order.length === 0;
+    document.getElementById("sheetChips").innerHTML = order.map(function (id, i) {
+      var n = Object.keys((sheets[id] || {}).scores || {}).length;
+      return '<button type="button" data-sheet="' + esc(id) + '"' + (editingId === id ? ' class="editing"' : "")
+        + ">#" + (i + 1) + "<small>" + n + "문제</small></button>";
+    }).join("");
+  }
+
+  function boxes() { return Array.prototype.slice.call(document.querySelectorAll("#qList input[data-pid]")); }
+  function moveFocus(from, step) {
+    var all = boxes(), i = all.indexOf(from);
+    var next = all[i + step];
+    if (next) { next.focus(); next.select(); }
+    else if (step > 0) from.blur();
+  }
+
+  function renderResult() {
+    var rows = teamStats(), done = Object.keys(sheets).length;
+    var top = document.getElementById("resultTop"), rl = document.getElementById("rankList");
+
+    if (!done) {
+      top.innerHTML = '<div class="card" style="grid-column:1/-1"><p class="empty">아직 입력된 평가지가 없습니다.<br>1단계에서 첫 장을 넣어보세요.</p></div>';
+      rl.innerHTML = "";
+      document.getElementById("teamBlock").hidden = true;
+      document.getElementById("probBlock").hidden = true;
+      return;
+    }
+    document.getElementById("teamBlock").hidden = false;
+    document.getElementById("probBlock").hidden = false;
+
+    var plist = problemRanking();
+    var bestP = plist.filter(function (c) { return c.rank === 1; });
+    var tied = rows.filter(function (r) { return r.rank === 1; });
+
+    var teamCard = '<div class="winner">'
+      + '<div class="k">' + (tied.length > 1 ? "공동 조 1등" : "조 1등") + "</div>"
+      + '<div class="nm">' + tied.map(function (r) { return esc(r.team.name); }).join(", ") + "</div>"
+      + '<div class="sc">' + fmt(rows[0].avg) + " <span>/ 5.00</span></div>"
+      + '<div class="sub2">2문제 평균의 평균 · 평가지 ' + done + "장 반영</div></div>";
+
+    var probCard = bestP.length ? '<div class="winner alt">'
+      + '<div class="k">' + (bestP.length > 1 ? "공동 문제 1등" : "문제 1등") + "</div>"
+      + '<div class="nm">' + bestP.map(function (c) { return esc(c.problem.name); }).join(", ") + "</div>"
+      + '<div class="sc">' + fmt(bestP[0].avg) + " <span>/ 5.00</span></div>"
+      + '<div class="sub2">' + bestP.map(function (c) { return esc(c.problem.team.name); }).join(", ")
+      + " 세팅 · " + bestP[0].n + "명 평가</div></div>" : "";
+
+    top.innerHTML = teamCard + probCard;
+
+    rl.innerHTML = rows.map(function (r) {
+      return '<div class="rank-row" style="--tape:' + r.tape + '">'
+        + '<div class="no">' + (r.rank === null ? "–" : r.rank) + "</div>"
+        + '<div><div class="nm">' + esc(r.team.name) + "</div>"
+        + '<div class="detail">문제별 ' + r.probs.map(function (c) { return fmt(c.avg); }).join("  ·  ")
+        + " · 평가 " + r.votes + "건</div></div>"
+        + '<div class="score"><b>' + fmt(r.avg) + "</b><span> / 5</span></div></div>";
+    }).join("");
+
+    document.getElementById("probRank").innerHTML = plist.map(function (c) {
+      var dist = c.dist.map(function (n, i) { return n ? ((i + 1) / 2) + "점 " + n + "명" : null; }).filter(Boolean).join(" · ") || "평가 없음";
+      return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
+        + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
+        + '<div><div class="nm">' + esc(c.problem.name) + (c.rank === 1 ? '<span class="best-tag">최고 문제</span>' : "") + "</div>"
+        + '<div class="detail">' + esc(c.problem.team.name) + " 세팅 · " + c.n + "명 평가 · " + dist + "</div></div>"
+        + '<div class="score"><b>' + fmt(c.avg) + "</b><span> / 5</span></div></div>";
+    }).join("");
+  }
+
+  function problemRanking() {
+    var pm = problemStats();
+    var list = allProblems().map(function (p) { return pm[p.id]; });
+    list.sort(function (a, b) {
+      if (a.avg === null && b.avg === null) return 0;
+      if (a.avg === null) return 1;
+      if (b.avg === null) return -1;
+      if (b.avg !== a.avg) return b.avg - a.avg;
+      return b.n - a.n;
+    });
+    var rank = 0, prev = null;
+    list.forEach(function (c, i) {
+      if (c.avg === null) { c.rank = null; return; }
+      if (prev === null || Math.abs(c.avg - prev) > 1e-9) rank = i + 1;
+      c.rank = rank; prev = c.avg;
+    });
+    return list;
+  }
+
+
+  /* ---------- 상호작용 ---------- */
+  document.querySelector("nav.steps").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-tab]");
+    if (!b) return;
+    tab = b.dataset.tab;
+    document.querySelectorAll("nav.steps button").forEach(function (x) {
+      x.setAttribute("aria-selected", x.dataset.tab === tab ? "true" : "false");
+    });
+    ["input", "result"].forEach(function (t) { document.getElementById("pane-" + t).hidden = t !== tab; });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  });
+
+  var qList = document.getElementById("qList");
+
+  // "4"까지는 4.5가 될 수 있으니 칸에 머무르고, 이어 친 숫자가 이 칸에서 말이 안 될 때
+  // 비로소 다음 칸으로 넘긴다 — 4 다음 3을 치면 4점 / 3점 두 문제로 갈린다.
+  function isPartial(s) {
+    if (s === "" || s === ".") return true;
+    if (!/^(?:[0-5](?:\.[05]?)?|\.[05])$/.test(s)) return false;   // ".5" = 0.5 도 허용
+    return parseFloat(s) <= 5;
+  }
+  function commitBox(inp) {
+    var v = parseFloat(inp.value);
+    if (isFinite(v)) v = Math.round(v * 2) / 2; else v = NaN;
+    if (isScore(v)) draft[inp.dataset.pid] = v;
+    else delete draft[inp.dataset.pid];
+    inp.classList.toggle("filled", !!draft[inp.dataset.pid]);
+    inp.dataset.prev = inp.value;
+    updateSheetMeta();
+  }
+  function normalizeBox(inp) {
+    var v = draft[inp.dataset.pid];
+    inp.value = v ? scoreText(v) : "";
+    inp.dataset.prev = inp.value;
+  }
+
+  qList.addEventListener("input", function (e) {
+    var inp = e.target.closest("input[data-pid]");
+    if (!inp) return;
+    var prev = inp.dataset.prev || "";
+    var raw = inp.value.replace(/[^0-9.]/g, "");
+
+    if (isPartial(raw)) { inp.value = raw; commitBox(inp); return; }
+
+    // 이 칸에서 유효하지 않은 입력 = 다음 문제의 첫 숫자
+    var added = raw.length > prev.length && raw.indexOf(prev) === 0 ? raw.slice(prev.length) : raw.slice(-1);
+    inp.value = prev;
+    commitBox(inp);
+    var next = boxes()[boxes().indexOf(inp) + 1];
+    if (next && isPartial(added)) {
+      next.focus();
+      next.value = added;
+      commitBox(next);
+    }
+  });
+
+  qList.addEventListener("focus", function (e) {
+    var inp = e.target.closest("input[data-pid]");
+    if (inp) inp.select();
+  }, true);
+
+  qList.addEventListener("keydown", function (e) {
+    var inp = e.target.closest("input[data-pid]");
+    if (!inp) return;
+    if (e.key === "Enter") { document.getElementById("saveBtn").click(); e.preventDefault(); }
+    else if (e.key === "ArrowDown") { moveFocus(inp, 1); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { moveFocus(inp, -1); e.preventDefault(); }
+    else if (e.key === "Backspace" && !inp.value) {
+      moveFocus(inp, -1);
+      var all = boxes(), prev = all[all.indexOf(inp) - 1];
+      if (prev) { prev.value = ""; commitBox(prev); }
+      e.preventDefault();
+    }
+  });
+
+  qList.addEventListener("blur", function (e) {
+    var inp = e.target.closest("input[data-pid]");
+    if (inp) normalizeBox(inp);     // "4." 처럼 치다 만 값을 4로 정리
+  }, true);
+
+  function focusFirstBox() { var f = boxes()[0]; if (f) f.focus(); }
+
+  // 목표 장수를 넘기면 한 번 더 눌러야 저장된다 — 같은 평가지를 두 번 넣는 사고를 막는다.
+  var overArmed = false, overTimer = null;
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    if (!Object.keys(draft).length) return;
+    var target = config.target || 30, count = Object.keys(sheets).length;
+    if (!editingId && count >= target && !overArmed) {
+      overArmed = true;
+      clearTimeout(overTimer);
+      overTimer = setTimeout(function () { overArmed = false; }, 6000);
+      toast("이미 " + target + "장을 채웠습니다. 한 번 더 누르면 " + (count + 1) + "장째로 저장됩니다.",
+        "장수 늘리기", function () { var t = document.getElementById("cntTarget"); t.focus(); t.select(); });
+      return;
+    }
+    overArmed = false;
+    if (editingId && sheets[editingId]) {
+      var no = sheetNoOf(editingId);
+      putSheet(editingId, { scores: draft, at: sheets[editingId].at });
+      editingId = null; draft = {};
+      render(); focusFirstBox();
+      toast("#" + no + " 평가지를 수정했습니다.");
+      return;
+    }
+    var id = addSheet({ scores: draft, at: new Date().toISOString() });
+    var n = Object.keys(sheets).length;
+    draft = {};
+    render(); focusFirstBox();
+    toast(n + "장째 저장했습니다.", "되돌리기", function () { dropSheet(id); });
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    draft = {};
+    syncBoxes(); updateSheetMeta(); focusFirstBox();
+  });
+
+  document.getElementById("cancelEditBtn").addEventListener("click", function () {
+    editingId = null; draft = {};
+    render(); focusFirstBox();
+  });
+
+  // 아티팩트는 샌드박스 iframe이라 confirm()이 무시된다 — 한 번 더 누르는 방식으로 확인받는다.
+  var armedBtn = null, armTimer = null;
+  function disarm() {
+    clearTimeout(armTimer);
+    if (armedBtn) { armedBtn.textContent = armedBtn.dataset.label; armedBtn.classList.remove("armed"); armedBtn = null; }
+  }
+  function confirmClick(btn, question, onYes) {
+    btn.dataset.label = btn.textContent;
+    btn.addEventListener("click", function () {
+      if (armedBtn === btn) { disarm(); onYes(); return; }
+      disarm();
+      armedBtn = btn;
+      btn.textContent = question;
+      btn.classList.add("armed");
+      armTimer = setTimeout(disarm, 5000);
+    });
+  }
+
+  confirmClick(document.getElementById("deleteEditBtn"), "한 번 더 누르면 삭제", function () {
+    if (!editingId || !sheets[editingId]) return;
+    var no = sheetNoOf(editingId);
+    dropSheet(editingId);
+    editingId = null; draft = {};
+    render(); focusFirstBox();
+    toast("#" + no + " 평가지를 삭제했습니다. 뒷번호는 한 칸씩 당겨집니다.");
+  });
+
+  document.getElementById("sheetChips").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-sheet]");
+    if (!b) return;
+    var id = b.dataset.sheet;
+    if (editingId === id) { editingId = null; draft = {}; }
+    else { editingId = id; draft = Object.assign({}, (sheets[id] || {}).scores || {}); }
+    render();
+    document.getElementById("qList").scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+
+  document.getElementById("cntTarget").addEventListener("change", function () {
+    var tv = parseInt(this.value, 10);
+    config.target = (tv >= 1 && tv <= 200) ? tv : 30;
+    this.value = config.target;
+    saveConfig();
+  });
+
+  confirmClick(document.getElementById("resetAll"), "한 번 더 누르면 전부 삭제", function () {
+    var keys = Object.keys(sheets);
+    sheets = {}; editingId = null; draft = {};
+    render();
+    if (db) keys.forEach(function (k) { db.doc("sheets/" + k).delete().catch(function () {}); });
+    else persistLocal();
+    toast(keys.length + "장을 모두 삭제했습니다.");
+  });
+
+  document.getElementById("csvBtn").addEventListener("click", function () {
+    var pm = problemStats();
+    var lines = ["조,순위,조평균"];
+    teamStats().forEach(function (r) {
+      lines.push('"' + r.team.name + '",' + (r.rank === null ? "" : r.rank) + "," + (r.avg === null ? "" : r.avg.toFixed(3)));
+    });
+    var head = ["문제", "세팅조", "평균", "평가인원"];
+    for (var s = 1; s <= 10; s++) head.push((s / 2) + "점");
+    lines.push("", head.join(","));
+    allProblems().forEach(function (p) {
+      var c = pm[p.id];
+      lines.push('"' + p.name.replace(/"/g, '""') + '","' + p.team.name + '",'
+        + (c.avg === null ? "" : c.avg.toFixed(3)) + "," + c.n + "," + c.dist.join(","));
+    });
+    lines.push("", "입력한 평가지 수," + Object.keys(sheets).length);
+    var csv = "﻿" + lines.join("\r\n");
+    var out = document.getElementById("csvOut");
+    if (downloads) {
+      downloads.save({ filename: "루트세팅-결과.csv", data: csv })
+        .then(function () { out.innerHTML = '<p class="hint">CSV를 저장했습니다.</p>'; })
+        .catch(function (e) { if (e && e.code === "declined") { out.innerHTML = ""; return; } csvFallback(csv); });
+    } else csvFallback(csv);
+  });
+
+  function csvFallback(csv) {
+    var out = document.getElementById("csvOut");
+    if (!IN_ARTIFACT && window.Blob && window.URL && window.URL.createObjectURL) {
+      var url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      var a = document.createElement("a");
+      a.href = url; a.download = "루트세팅-결과.csv";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      out.innerHTML = '<p class="hint">CSV를 내려받았습니다.</p>';
+      return;
+    }
+    out.innerHTML = '<p class="hint">파일 저장을 쓸 수 없어 내용을 펼쳤습니다. 전체 선택해 복사한 뒤 엑셀에 붙여 넣으세요.</p>'
+      + '<textarea readonly style="width:100%;height:150px;font-size:12px;background:var(--ground);color:var(--ink);'
+      + 'border:1px solid var(--line-strong);border-radius:9px;padding:10px"></textarea>';
+    out.querySelector("textarea").value = csv;
+  }
+
+  /* ---------- 시작 ---------- */
+  (function boot() {
+    var c = lsGet(LS_CFG, null);
+    if (c && c.teams) config = { teams: c.teams, target: c.target || 30 };
+    var s = lsGet(LS_SHEETS, {});
+    Object.keys(s).forEach(function (k) { sheets[k] = s[k]; });
+    render();
+  })();
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("db").then(function (store) {
+      if (!store) { storeMode = "local"; render(); return; }
+      db = store; storeMode = "shared";
+      db.doc("config/main").onSnapshot(function (snap) {
+        if (snap.exists) {
+          var d = snap.data() || {};
+          if (Array.isArray(d.teams) && d.teams.length) config.teams = d.teams;
+          if (d.target) config.target = d.target;
+        }
+        render();
+      }, function () { render(); });
+      db.collection("sheets").onSnapshot(function (snap) {
+        sheets = {};
+        snap.docs.forEach(function (d) { sheets[d.id] = d.data() || {}; });
+        render();
+      }, function (e) { storeMode = "local"; onStoreError(e); render(); });
+      render();
+    }).catch(function () { storeMode = "local"; render(); });
+    window.claude.use("downloads").then(function (d) { downloads = d; }).catch(function () {});
+  } else {
+    storeMode = "local"; render();
+  }
+})();
+</script>
+
+</body>
+</html>
