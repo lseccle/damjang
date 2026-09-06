@@ -89,22 +89,28 @@
     font-size: 12px; font-weight: 700; margin: 0 0 12px; color: var(--brand);
     letter-spacing: .04em;
   }
+  /* 각 단계를 display:contents 로 풀어 제목행·설명행을 세 칸이 공유하게 한다 —
+     제목 길이가 달라도 설명 시작 줄이 어긋나지 않는다. */
   .howto-grid {
     list-style: none; margin: 0; padding: 0;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    column-gap: 16px; row-gap: 7px;
   }
-  .howto-step { display: grid; grid-template-columns: 22px 1fr; gap: 4px 9px; align-items: start; }
+  .howto-step { display: contents; }
+  .howto-step .hd { display: flex; align-items: center; gap: 8px; }
   .howto-step .n {
-    grid-row: 1 / span 2;
-    width: 22px; height: 22px; border-radius: 50%;
+    width: 22px; height: 22px; border-radius: 50%; flex: none;
     background: var(--brand); color: #fff;
     font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
   }
-  .howto-step b { font-size: 14px; font-weight: 700; color: var(--brand-deep); align-self: center; }
-  .howto-step p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--brand-deep); opacity: .82; word-break: keep-all; }
+  .howto-step b { font-size: 14px; font-weight: 700; color: var(--brand-deep); word-break: keep-all; }
+  .howto-step p {
+    margin: 0; font-size: 12.5px; line-height: 1.7;
+    color: var(--brand-deep); opacity: .84; word-break: keep-all;
+  }
   @media (max-width: 640px) {
-    .howto-grid { grid-template-columns: 1fr; gap: 13px; }
-    .howto-step + .howto-step { border-top: 1px solid rgba(192,57,43,.14); padding-top: 13px; }
+    .howto-grid { grid-template-columns: 1fr; row-gap: 6px; }
+    .howto-step + .howto-step .hd { margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(192,57,43,.14); }
   }
 
   .steps { display: flex; gap: 8px; margin: 18px 0 0; flex-wrap: wrap; }
@@ -321,19 +327,16 @@
     <h2>사용 방법</h2>
     <ol class="howto-grid">
       <li class="howto-step">
-        <span class="n">1</span>
-        <b>평가지 입력</b>
-        <p>종이 한 장을 보고 문제마다 점수를 칩니다. 반 점은 4.5처럼 소수점까지, 빈 문제는 ↓ 로 건너뜁니다.</p>
+        <span class="hd"><span class="n">1</span><b>평가지 입력</b></span>
+        <p>걷어 온 평가지를 한 장 펼치고, 문제마다 적힌 점수를 그대로 옮겨 적어 주세요. 반 점은 4.5처럼 소수점까지 넣을 수 있고, 비어 있는 문제는 ↓ 키로 건너뛰면 됩니다.</p>
       </li>
       <li class="howto-step">
-        <span class="n">2</span>
-        <b>저장하고 다음 장</b>
-        <p>화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣은 장은 번호를 눌러 고칩니다.</p>
+        <span class="hd"><span class="n">2</span><b>저장하고 다음 장</b></span>
+        <p>한 장을 다 넣었으면 버튼을 눌러 주세요. 화면이 깨끗이 비워져 바로 다음 장을 이어서 넣을 수 있습니다. 잘못 넣었더라도 아래 번호를 눌러 언제든 고칠 수 있으니 편하게 진행하세요.</p>
       </li>
       <li class="howto-step">
-        <span class="n">3</span>
-        <b>결과 확인</b>
-        <p>마지막 장을 넣는 순간 조 1등과 문제 1등이 나옵니다.</p>
+        <span class="hd"><span class="n">3</span><b>결과 확인</b></span>
+        <p>마지막 장을 넣는 순간 조 1등과 문제 1등이 바로 계산돼 나옵니다. 결과는 CSV로 내려받아 두시면 나중에 다시 확인하기 좋습니다.</p>
       </li>
     </ol>
   </section>
