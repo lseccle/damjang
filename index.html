@@ -680,8 +680,8 @@
     var btn = document.getElementById("saveBtn");
     btn.disabled = filled === 0;
     btn.textContent = filled === 0 ? "점수를 입력해주세요"
-      : editing ? "수정 저장 (" + filled + "문제)"
-      : "저장하고 다음 장 (" + filled + "문제)";
+      : editing ? "수정 저장"
+      : "저장하고 다음 장";
   }
 
   function renderPast() {
