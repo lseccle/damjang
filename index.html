@@ -311,10 +311,6 @@
   .seclabel b { font-size: 15px; font-weight: 700; }
   .seclabel span { font-size: 12px; color: var(--muted); }
 
-  .best-tag {
-    font-size: 11px; font-weight: 700; color: #fff; background: var(--brand);
-    border-radius: 20px; padding: 2px 9px; margin-left: 7px; vertical-align: 2px;
-  }
   .rank-row.best { border-color: var(--brand); box-shadow: var(--shadow); }
   .rank { display: flex; flex-direction: column; gap: 8px; }
   .rank-row {
@@ -714,6 +710,9 @@
     delBtn.hidden = !editing;
     var full = isFull();
     document.getElementById("fullNote").hidden = !full;
+    document.getElementById("qList").hidden = full;
+    document.querySelector("#pane-input .sheet-hd").hidden = full;
+    document.querySelector("#pane-input .savebar").hidden = full;
     boxes().forEach(function (b) { b.disabled = full; });
     document.getElementById("clearBtn").disabled = full;
     var btn = document.getElementById("saveBtn");
@@ -794,7 +793,7 @@
         : "아직 평가 없음";
       return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
-        + '<div><div class="nm">' + esc(c.problem.name) + (c.rank === 1 ? '<span class="best-tag">최고 문제</span>' : "") + "</div>"
+        + '<div><div class="nm">' + esc(c.problem.name) + "</div>"
         + '<div class="detail">' + dist + "</div></div>"
         + '<div class="score"><b>' + fmt(c.avg) + "</b><span> / 5</span></div></div>";
     }).join("");
