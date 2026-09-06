@@ -93,15 +93,33 @@
     letter-spacing: .04em;
   }
   .howto[open] > summary { margin-bottom: 12px; }
-  .howto .caret { display: none; margin-left: auto; color: var(--brand); font-size: 12px; }
+  .howto > summary { cursor: pointer; }
+  .howto .steps-hint {
+    display: none; margin-left: auto; font-size: 11px; font-weight: 600;
+    color: var(--brand); background: rgba(192,57,43,.1);
+    border-radius: 999px; padding: 2px 9px;
+  }
+  .howto .caret {
+    display: none; width: 17px; height: 17px; flex: none;
+    fill: none; stroke: var(--brand); stroke-width: 2.4;
+    stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .18s ease;
+  }
   .howto[open] .caret { transform: rotate(180deg); }
   /* 접혀 있으면 어느 폭에서든 펼칠 수 있는 표시가 보여야 한다 */
-  .howto:not([open]) .caret { display: inline-block; }
-  .howto > summary { cursor: pointer; }
+  .howto:not([open]) .caret { display: block; }
+  @media (prefers-reduced-motion: reduce) { .howto .caret { transition: none; } }
+  /* 폰에서 접힌 상태는 아래 단계 버튼과 같은 알약 모양으로 — 누르는 것임이 바로 보이게 */
   @media (max-width: 640px) {
-    .howto > summary { padding: 2px 0; }
-    .howto .caret { display: inline-block; }
+    .howto { padding: 13px 18px; border-radius: 999px; transition: border-radius .18s ease; }
+    .howto[open] { padding: 16px 18px 18px; border-radius: var(--r); }
+    .howto > summary { padding: 0; }
+    .howto h2 { font-size: 13px; }
+    .howto .caret, .howto .steps-hint { display: block; }
+    .howto[open] .steps-hint { display: none; }
+    .howto .caret { margin-left: 0; }
   }
+  @media (min-width: 641px) { .howto .caret { margin-left: auto; } }
   /* 각 단계를 display:contents 로 풀어 제목행·설명행을 세 칸이 공유하게 한다 —
      제목 길이가 달라도 설명 시작 줄이 어긋나지 않는다. */
   .howto-grid {
@@ -218,6 +236,11 @@
   }
   .qrow .sbox::-webkit-outer-spin-button, .qrow .sbox::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .qrow .sbox:focus { outline: none; border-color: var(--brand); background: var(--soft); box-shadow: 0 0 0 3px rgba(192,57,43,.13); }
+  .full-note {
+    background: var(--soft); border: 1px solid rgba(192,57,43,.18); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 12px; color: var(--brand-deep); opacity: .9;
+  }
+  .qrow .sbox:disabled { opacity: .5; }
   .qrow .sbox.filled { border-color: var(--brand); color: var(--brand); background: var(--surface); }
 
   /* 지난 평가지 */
@@ -350,7 +373,11 @@
   </header>
 
   <details class="howto" id="howto">
-    <summary><h2>사용 방법</h2><span class="caret" aria-hidden="true">▾</span></summary>
+    <summary>
+      <h2>사용 방법</h2>
+      <span class="steps-hint" aria-hidden="true">3단계</span>
+      <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>
+    </summary>
     <ol class="howto-grid">
       <li class="howto-step">
         <span class="hd"><span class="n">1</span><b>평가지 입력</b></span>
@@ -387,6 +414,7 @@
       </div>
 
       <div class="card">
+        <p class="hint full-note" id="fullNote" hidden>정해둔 <b>30장</b>을 모두 입력했습니다. 더 넣으려면 위의 전체 장수를 늘리고, 잘못 넣은 장은 아래 번호를 눌러 고치세요.</p>
         <div class="sheet-hd">
           <span class="no" id="sheetNo">평가지 #1</span>
           <span class="spacer"></span>
@@ -667,6 +695,11 @@
     });
   }
 
+  // 정해둔 장수를 다 채웠는지 — 지난 장 수정은 계속 되어야 하므로 새 입력일 때만 막는다
+  function isFull() {
+    return !editingId && Object.keys(sheets).length >= (config.target || 30);
+  }
+
   function updateSheetMeta() {
     var probs = allProblems();
     var filled = probs.filter(function (p) { return hasScore(p.id); }).length;
@@ -679,9 +712,14 @@
     var delBtn = document.getElementById("deleteEditBtn");
     if (!editing && armedBtn === delBtn) disarm();
     delBtn.hidden = !editing;
+    var full = isFull();
+    document.getElementById("fullNote").hidden = !full;
+    boxes().forEach(function (b) { b.disabled = full; });
+    document.getElementById("clearBtn").disabled = full;
     var btn = document.getElementById("saveBtn");
-    btn.disabled = filled === 0;
-    btn.textContent = filled === 0 ? "점수를 입력해주세요"
+    btn.disabled = full || filled === 0;
+    btn.textContent = full ? (config.target || 30) + "장 입력 완료"
+      : filled === 0 ? "점수를 입력해주세요"
       : editing ? "수정 저장"
       : "저장하고 다음 장";
   }
@@ -733,7 +771,7 @@
       + '<div class="nm">' + bestP.map(function (c) { return esc(c.problem.name); }).join(", ") + "</div>"
       + '<div class="sc">' + fmt(bestP[0].avg) + " <span>/ 5.00</span></div>"
       + '<div class="sub2">' + (bestP.length > 1 ? bestP.length + "개 문제 공동 1등"
-          : bestP[0].n + "명이 매긴 평균") + "</div></div>" : "";
+          : bestP[0].n + "명이 매긴 평균 점수") + "</div></div>" : "";
 
     top.innerHTML = teamCard + probCard;
 
@@ -741,8 +779,9 @@
       return '<div class="rank-row" style="--tape:' + r.tape + '">'
         + '<div class="no">' + (r.rank === null ? "–" : r.rank) + "</div>"
         + '<div><div class="nm">' + esc(r.team.name) + "</div>"
-        + '<div class="detail">문제별 ' + r.probs.map(function (c) { return fmt(c.avg); }).join("  ·  ")
-        + "</div></div>"
+        + '<div class="detail">' + r.probs.map(function (c, i) {
+            return (i + 1) + "번 문제 평균 " + fmt(c.avg);
+          }).join("  ·  ") + "</div></div>"
         + '<div class="score"><b>' + fmt(r.avg) + "</b><span> / 5</span></div></div>";
     }).join("");
 
@@ -750,7 +789,9 @@
       var top = 0, ti = -1;
       c.dist.forEach(function (n, i) { if (n > top) { top = n; ti = i; } });
       // 최다 점수가 1명뿐이면 알려주는 게 없어 오히려 군더더기가 된다
-      var dist = c.n ? c.n + "명 평가" + (top > 1 ? " · 최다 " + (ti / 2) + "점 " + top + "명" : "") : "평가 없음";
+      var dist = c.n
+        ? c.n + "명이 평가" + (top > 1 ? " · 가장 많이 나온 점수는 " + (ti / 2) + "점 (" + top + "명)" : "")
+        : "아직 평가 없음";
       return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
         + '<div><div class="nm">' + esc(c.problem.name) + (c.rank === 1 ? '<span class="best-tag">최고 문제</span>' : "") + "</div>"
@@ -876,20 +917,9 @@
 
   function focusFirstBox() { var f = boxes()[0]; if (f) f.focus(); }
 
-  // 목표 장수를 넘기면 한 번 더 눌러야 저장된다 — 같은 평가지를 두 번 넣는 사고를 막는다.
-  var overArmed = false, overTimer = null;
   document.getElementById("saveBtn").addEventListener("click", function () {
     if (!Object.keys(draft).length) return;
-    var target = config.target || 30, count = Object.keys(sheets).length;
-    if (!editingId && count >= target && !overArmed) {
-      overArmed = true;
-      clearTimeout(overTimer);
-      overTimer = setTimeout(function () { overArmed = false; }, 6000);
-      toast("이미 " + target + "장을 채웠습니다. 한 번 더 누르면 " + (count + 1) + "장째로 저장됩니다.",
-        "장수 늘리기", function () { var t = document.getElementById("cntTarget"); t.focus(); t.select(); });
-      return;
-    }
-    overArmed = false;
+    if (isFull()) return;                 // 정해둔 장수를 채우면 새 장은 받지 않는다
     if (editingId && sheets[editingId]) {
       var no = sheetNoOf(editingId);
       putSheet(editingId, { scores: draft, at: sheets[editingId].at });
