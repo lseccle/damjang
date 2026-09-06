@@ -786,16 +786,9 @@
     }).join("");
 
     document.getElementById("probRank").innerHTML = plist.map(function (c) {
-      var top = 0, ti = -1;
-      c.dist.forEach(function (n, i) { if (n > top) { top = n; ti = i; } });
-      // 최다 점수가 1명뿐이면 알려주는 게 없어 오히려 군더더기가 된다
-      var dist = c.n
-        ? c.n + "명이 평가" + (top > 1 ? " · 가장 많이 나온 점수는 " + (ti / 2) + "점 (" + top + "명)" : "")
-        : "아직 평가 없음";
       return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
-        + '<div><div class="nm">' + esc(c.problem.name) + "</div>"
-        + '<div class="detail">' + dist + "</div></div>"
+        + '<div class="nm">' + esc(c.problem.name) + "</div>"
         + '<div class="score"><b>' + fmt(c.avg) + "</b><span> / 5</span></div></div>";
     }).join("");
   }
