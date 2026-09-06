@@ -400,7 +400,7 @@
       <div class="heroes" id="resultTop"></div>
 
       <div id="teamBlock" hidden>
-        <div class="seclabel"><b>조 순위</b><span>각 조 2문제 평균의 평균</span></div>
+        <div class="seclabel"><b>조 순위</b><span>각 조 2문제의 평균</span></div>
         <div class="rank" id="rankList"></div>
       </div>
 
@@ -705,7 +705,7 @@
       + '<div class="k">' + (tied.length > 1 ? "공동 조 1등" : "조 1등") + "</div>"
       + '<div class="nm">' + tied.map(function (r) { return esc(r.team.name); }).join(", ") + "</div>"
       + '<div class="sc">' + fmt(rows[0].avg) + " <span>/ 5.00</span></div>"
-      + '<div class="sub2">2문제 평균의 평균 · 평가지 ' + done + "장 반영</div></div>";
+      + '<div class="sub2">2문제의 평균 · 평가지 ' + done + "장 반영</div></div>";
 
     var probCard = bestP.length ? '<div class="winner alt">'
       + '<div class="k">' + (bestP.length > 1 ? "공동 문제 1등" : "문제 1등") + "</div>"
