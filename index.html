@@ -711,8 +711,8 @@
       + '<div class="k">' + (bestP.length > 1 ? "공동 문제 1등" : "문제 1등") + "</div>"
       + '<div class="nm">' + bestP.map(function (c) { return esc(c.problem.name); }).join(", ") + "</div>"
       + '<div class="sc">' + fmt(bestP[0].avg) + " <span>/ 5.00</span></div>"
-      + '<div class="sub2">' + bestP.map(function (c) { return esc(c.problem.team.name); }).join(", ")
-      + " 세팅 · " + bestP[0].n + "명 평가</div></div>" : "";
+      + '<div class="sub2">' + (bestP.length > 1 ? bestP.length + "개 문제 공동 1등"
+          : bestP[0].n + "명이 매긴 평균") + "</div></div>" : "";
 
     top.innerHTML = teamCard + probCard;
 
@@ -721,16 +721,18 @@
         + '<div class="no">' + (r.rank === null ? "–" : r.rank) + "</div>"
         + '<div><div class="nm">' + esc(r.team.name) + "</div>"
         + '<div class="detail">문제별 ' + r.probs.map(function (c) { return fmt(c.avg); }).join("  ·  ")
-        + " · 평가 " + r.votes + "건</div></div>"
+        + "</div></div>"
         + '<div class="score"><b>' + fmt(r.avg) + "</b><span> / 5</span></div></div>";
     }).join("");
 
     document.getElementById("probRank").innerHTML = plist.map(function (c) {
-      var dist = c.dist.map(function (n, i) { return n ? ((i + 1) / 2) + "점 " + n + "명" : null; }).filter(Boolean).join(" · ") || "평가 없음";
+      var top = 0, ti = -1;
+      c.dist.forEach(function (n, i) { if (n > top) { top = n; ti = i; } });
+      var dist = c.n ? c.n + "명 평가" + (top ? " · 최다 " + ((ti + 1) / 2) + "점 " + top + "명" : "") : "평가 없음";
       return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
         + '<div><div class="nm">' + esc(c.problem.name) + (c.rank === 1 ? '<span class="best-tag">최고 문제</span>' : "") + "</div>"
-        + '<div class="detail">' + esc(c.problem.team.name) + " 세팅 · " + c.n + "명 평가 · " + dist + "</div></div>"
+        + '<div class="detail">' + dist + "</div></div>"
         + '<div class="score"><b>' + fmt(c.avg) + "</b><span> / 5</span></div></div>";
     }).join("");
   }
