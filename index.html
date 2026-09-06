@@ -91,7 +91,7 @@
   }
   .howto-grid {
     list-style: none; margin: 0; padding: 0;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
   }
   .howto-step { display: grid; grid-template-columns: 22px 1fr; gap: 4px 9px; align-items: start; }
   .howto-step .n {
@@ -101,7 +101,7 @@
     font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
   }
   .howto-step b { font-size: 14px; font-weight: 700; color: var(--brand-deep); align-self: center; }
-  .howto-step p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--brand-deep); opacity: .82; }
+  .howto-step p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--brand-deep); opacity: .82; word-break: keep-all; }
   @media (max-width: 640px) {
     .howto-grid { grid-template-columns: 1fr; gap: 13px; }
     .howto-step + .howto-step { border-top: 1px solid rgba(192,57,43,.14); padding-top: 13px; }
@@ -131,7 +131,7 @@
   section.pane { display: flex; flex-direction: column; gap: 14px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 17px; }
   .card h2.ch { font-size: 16px; font-weight: 700; margin: 0 0 3px; }
-  .hint { color: var(--muted); font-size: 13px; margin: 0; }
+  .hint { color: var(--muted); font-size: 13px; margin: 0; word-break: keep-all; }
 
   /* 진행 */
   .counter { display: flex; align-items: center; gap: 14px; }
@@ -323,12 +323,12 @@
       <li class="howto-step">
         <span class="n">1</span>
         <b>평가지 입력</b>
-        <p>종이 한 장을 보고 문제마다 점수를 칩니다. 0.5부터 5까지, 반 점은 4.5처럼 소수점까지 치면 됩니다. 빈 문제는 ↓ 로 건너뜁니다.</p>
+        <p>종이 한 장을 보고 문제마다 점수를 칩니다. 반 점은 4.5처럼 소수점까지, 빈 문제는 ↓ 로 건너뜁니다.</p>
       </li>
       <li class="howto-step">
         <span class="n">2</span>
         <b>저장하고 다음 장</b>
-        <p>누르면 화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣은 장은 번호를 눌러 다시 고칠 수 있습니다.</p>
+        <p>화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣은 장은 번호를 눌러 고칩니다.</p>
       </li>
       <li class="howto-step">
         <span class="n">3</span>
@@ -364,7 +364,7 @@
           <span class="spacer"></span>
           <span class="cnt" id="sheetCnt">0 / 10 입력</span>
         </div>
-        <p class="hint" id="kbHint" style="margin-bottom:12px">0.5점 단위 · <b>4</b>는 4점, <b>4.5</b>는 4.5점 · 다음 숫자를 치면 다음 칸으로 · 건너뛰기 <b>↓</b> · 저장 <b>Enter</b></p>
+        <p class="hint" id="kbHint" style="margin-bottom:12px">0.5점 단위 · 4는 4점, 4.5는 4.5점 · 다음 숫자를 치면 다음 칸으로 · 건너뛰기 ↓ · 저장 Enter</p>
         <div id="qList"></div>
       </div>
 
@@ -583,7 +583,7 @@
     // 웹사이트로 열었을 땐 기기 저장이 정상 동작이라 경고가 아니라 안내로 적는다.
     el.innerHTML = IN_ARTIFACT
       ? '<div class="notice">공유 저장소에 연결하지 못했습니다. 입력한 평가지는 <b>이 기기에만</b> 저장되니 한 기기에서 끝까지 입력해 주세요.</div>'
-      : '<p class="hint" style="margin:0 2px">입력한 평가지는 <b>이 브라우저에</b> 저장됩니다. 새로고침해도 남지만 다른 기기·시크릿창에서는 보이지 않습니다.</p>';
+      : '<p class="hint" style="margin:0 2px">입력한 평가지는 이 브라우저에 저장됩니다. 새로고침해도 남지만 다른 기기·시크릿창에서는 보이지 않습니다.</p>';
   }
 
   function renderCounter() {
