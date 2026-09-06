@@ -160,23 +160,23 @@
   /* 입력 시트 */
   .sheet-hd {
     display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-    margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line-strong);
+    margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--line-strong);
   }
   .sheet-hd .no { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 18px; color: var(--ink); }
   .sheet-hd .spacer { flex: 1; }
   .sheet-hd .cnt { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
-  .tgroup { margin-top: 14px; }
+  .tgroup { margin-top: 10px; }
   .tgroup:first-child { margin-top: 0; }
   .tgroup > .gh {
-    display: flex; align-items: center; gap: 8px; margin: 0 0 6px 2px;
+    display: flex; align-items: center; gap: 8px; margin: 0 0 3px 2px;
   }
   .tgroup > .gh i { width: 16px; height: 7px; border-radius: 2px; background: var(--tape); }
   .tgroup > .gh span { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
 
   .qrow {
     display: flex; align-items: center; gap: 12px; justify-content: space-between;
-    padding: 7px 4px 7px 6px; border-radius: 10px; flex-wrap: wrap;
+    padding: 3px 4px 3px 6px; border-radius: 10px; flex-wrap: wrap;
   }
   .qrow .qt { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; flex: 1; min-width: 110px; }
   .cardhead { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
@@ -188,7 +188,7 @@
   }
   .counter .big input::-webkit-outer-spin-button, .counter .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .qrow .sbox {
-    flex: none; width: 64px; height: 46px; text-align: center;
+    flex: none; width: 62px; height: 40px; text-align: center;
     font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums;
     color: var(--ink); background: var(--ground);
     border: 1.5px solid var(--line-strong); border-radius: 10px; padding: 0;
@@ -324,7 +324,7 @@
   <header class="top">
     <div class="ttl">
       <h1><span class="ico" aria-hidden="true">🛠️</span>조별 루트 세팅 채점판</h1>
-      <p class="sub">5개 조 · 조당 2문제 · 5점 만점 (0.5점 단위)</p>
+      <p class="sub">5개 조 · 조당 2문제 · 0~5점 (0.5점 단위)</p>
     </div>
   </header>
 
@@ -333,7 +333,7 @@
     <ol class="howto-grid">
       <li class="howto-step">
         <span class="hd"><span class="n">1</span><b>평가지 입력</b></span>
-        <p>걷어 온 평가지를 한 장 펼치고, 문제마다 적힌 점수를 그대로 옮겨 적어 주세요. 숫자를 치면 다음 칸으로 자동으로 넘어갑니다. 반 점은 4.5처럼 소수점까지 넣을 수 있고, 비어 있는 문제는 ↓ 키로 건너뛰면 됩니다.</p>
+        <p>평가지에 적힌 점수를 그대로 옮겨 적어주세요. 숫자를 치면 다음 칸으로 자동으로 넘어갑니다. 점수는 0~5점까지이며 0.5 단위로 작성 가능합니다.</p>
       </li>
       <li class="howto-step">
         <span class="hd"><span class="n">2</span><b>저장</b></span>
@@ -341,7 +341,7 @@
       </li>
       <li class="howto-step">
         <span class="hd"><span class="n">3</span><b>결과 확인</b></span>
-        <p>마지막 장을 넣는 순간 조 1등과 문제 1등이 바로 계산돼 나옵니다. 결과는 CSV로 내려받아 두시면 나중에 다시 확인하기 좋습니다.</p>
+        <p>마지막 장을 넣는 순간 조 1등과 문제 1등이 바로 계산되어 나옵니다. 결과는 CSV로 내려받아 두시면 나중에 다시 확인하기 좋습니다.</p>
       </li>
     </ol>
   </section>
@@ -372,7 +372,6 @@
           <span class="spacer"></span>
           <span class="cnt" id="sheetCnt">0 / 10 입력</span>
         </div>
-        <p class="hint" id="kbHint" style="margin-bottom:12px">0.5점 단위 · 4는 4점, 4.5는 4.5점 · 다음 숫자를 치면 다음 칸으로 · 건너뛰기 ↓ · 저장 Enter</p>
         <div id="qList"></div>
       </div>
 
@@ -476,21 +475,22 @@
   /* ---------- 집계 ---------- */
   // 0.5점 단위 — 0.5 ~ 5.0, 분포는 10칸(0.5,1,…,5)
   function isScore(v) {
-    return typeof v === "number" && isFinite(v) && v >= 0.5 && v <= 5
+    return typeof v === "number" && isFinite(v) && v >= 0 && v <= 5
       && Math.abs(v * 2 - Math.round(v * 2)) < 1e-9;
   }
+  function hasScore(pid) { return draft[pid] !== undefined; }
   function zeros(n) { var a = []; for (var i = 0; i < n; i++) a.push(0); return a; }
   function scoreText(v) { return (Math.round(v * 2) / 2).toString(); }
 
   function problemStats() {
     var map = {};
-    allProblems().forEach(function (p) { map[p.id] = { problem: p, sum: 0, n: 0, dist: zeros(10), avg: null }; });
+    allProblems().forEach(function (p) { map[p.id] = { problem: p, sum: 0, n: 0, dist: zeros(11), avg: null }; });
     Object.keys(sheets).forEach(function (id) {
       var sc = (sheets[id] || {}).scores || {};
       Object.keys(sc).forEach(function (pid) {
         var c = map[pid], v = Number(sc[pid]);
         if (!c || !isScore(v)) return;
-        c.sum += v; c.n += 1; c.dist[Math.round(v * 2) - 1] += 1;
+        c.sum += v; c.n += 1; c.dist[Math.round(v * 2)] += 1;
       });
     });
     Object.keys(map).forEach(function (k) { var c = map[k]; c.avg = c.n ? c.sum / c.n : null; });
@@ -627,8 +627,8 @@
         html += '<div class="qrow"><label class="qt" for="in-' + esc(p.id) + '">' + esc(p.name) + "</label>"
              + '<input class="sbox" id="in-' + esc(p.id) + '" data-pid="' + esc(p.id) + '" type="text"'
              + ' inputmode="decimal" autocomplete="off" placeholder="–"'
-             + ' aria-label="' + esc(p.name) + ' 점수, 0.5에서 5, 0.5 단위"'
-             + ' value="' + (draft[p.id] ? scoreText(draft[p.id]) : "") + '"></div>';
+             + ' aria-label="' + esc(p.name) + ' 점수, 0에서 5, 0.5 단위"'
+             + ' value="' + (hasScore(p.id) ? scoreText(draft[p.id]) : "") + '"></div>';
       });
       if (lastTeam !== null) html += "</div>";
       list.innerHTML = html;
@@ -639,16 +639,16 @@
 
   function syncBoxes() {
     document.querySelectorAll("#qList input[data-pid]").forEach(function (inp) {
-      var v = draft[inp.dataset.pid];
-      if (document.activeElement !== inp) inp.value = v ? scoreText(v) : "";
+      var pid = inp.dataset.pid;
+      if (document.activeElement !== inp) inp.value = hasScore(pid) ? scoreText(draft[pid]) : "";
       inp.dataset.prev = inp.value;
-      inp.classList.toggle("filled", !!v);
+      inp.classList.toggle("filled", hasScore(pid));
     });
   }
 
   function updateSheetMeta() {
     var probs = allProblems();
-    var filled = probs.filter(function (p) { return draft[p.id]; }).length;
+    var filled = probs.filter(function (p) { return hasScore(p.id); }).length;
     var editing = editingId && sheets[editingId];
     document.getElementById("sheetNo").innerHTML = editing
       ? "평가지 #" + sheetNoOf(editingId) + ' <span class="editing-tag">수정 중</span>'
@@ -729,7 +729,7 @@
       var top = 0, ti = -1;
       c.dist.forEach(function (n, i) { if (n > top) { top = n; ti = i; } });
       // 최다 점수가 1명뿐이면 알려주는 게 없어 오히려 군더더기가 된다
-      var dist = c.n ? c.n + "명 평가" + (top > 1 ? " · 최다 " + ((ti + 1) / 2) + "점 " + top + "명" : "") : "평가 없음";
+      var dist = c.n ? c.n + "명 평가" + (top > 1 ? " · 최다 " + (ti / 2) + "점 " + top + "명" : "") : "평가 없음";
       return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
         + '<div><div class="nm">' + esc(c.problem.name) + (c.rank === 1 ? '<span class="best-tag">최고 문제</span>' : "") + "</div>"
@@ -784,13 +784,12 @@
     if (isFinite(v)) v = Math.round(v * 2) / 2; else v = NaN;
     if (isScore(v)) draft[inp.dataset.pid] = v;
     else delete draft[inp.dataset.pid];
-    inp.classList.toggle("filled", !!draft[inp.dataset.pid]);
+    inp.classList.toggle("filled", hasScore(inp.dataset.pid));
     inp.dataset.prev = inp.value;
     updateSheetMeta();
   }
   function normalizeBox(inp) {
-    var v = draft[inp.dataset.pid];
-    inp.value = v ? scoreText(v) : "";
+    inp.value = hasScore(inp.dataset.pid) ? scoreText(draft[inp.dataset.pid]) : "";
     inp.dataset.prev = inp.value;
   }
 
@@ -939,7 +938,7 @@
       lines.push('"' + r.team.name + '",' + (r.rank === null ? "" : r.rank) + "," + (r.avg === null ? "" : r.avg.toFixed(3)));
     });
     var head = ["문제", "세팅조", "평균", "평가인원"];
-    for (var s = 1; s <= 10; s++) head.push((s / 2) + "점");
+    for (var s = 0; s <= 10; s++) head.push((s / 2) + "점");
     lines.push("", head.join(","));
     allProblems().forEach(function (p) {
       var c = pm[p.id];
