@@ -303,8 +303,6 @@
   .winner.alt .nm { font-size: 22px; }
   .winner.alt .sc { color: var(--brand); }
   .winner.alt .sc span { color: var(--muted); opacity: 1; }
-  .winner .sub2 { margin-top: 7px; font-size: 12.5px; opacity: .8; }
-  .winner.alt .sub2 { color: var(--muted); opacity: 1; }
 
   .seclabel {
     display: flex; align-items: baseline; gap: 9px; margin: 4px 2px 9px; flex-wrap: wrap;
@@ -763,15 +761,12 @@
     var teamCard = '<div class="winner">'
       + '<div class="k">' + (tied.length > 1 ? "공동 조 1등" : "조 1등") + "</div>"
       + '<div class="nm">' + tied.map(function (r) { return esc(r.team.name); }).join(", ") + "</div>"
-      + '<div class="sc">' + fmt(rows[0].avg) + " <span>/ 5.00</span></div>"
-      + '<div class="sub2">2문제의 평균 · 평가지 ' + done + "장 반영</div></div>";
+      + '<div class="sc">' + fmt(rows[0].avg) + " <span>/ 5.00</span></div></div>";
 
     var probCard = bestP.length ? '<div class="winner alt">'
       + '<div class="k">' + (bestP.length > 1 ? "공동 문제 1등" : "문제 1등") + "</div>"
       + '<div class="nm">' + bestP.map(function (c) { return esc(c.problem.name); }).join(", ") + "</div>"
-      + '<div class="sc">' + fmt(bestP[0].avg) + " <span>/ 5.00</span></div>"
-      + '<div class="sub2">' + (bestP.length > 1 ? bestP.length + "개 문제 공동 1등"
-          : bestP[0].n + "명이 매긴 평균 점수") + "</div></div>" : "";
+      + '<div class="sc">' + fmt(bestP[0].avg) + " <span>/ 5.00</span></div></div>" : "";
 
     top.innerHTML = teamCard + probCard;
 
