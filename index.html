@@ -280,27 +280,26 @@
   .row.end { justify-content: flex-end; }
 
   /* 결과 */
-  .winner {
-    background: var(--brand); color: #fff; border-radius: var(--r);
-    padding: 24px 22px; box-shadow: var(--shadow); position: relative; overflow: hidden;
-  }
-  .winner .k {
-    font-size: 12px; font-weight: 700;
-    letter-spacing: .18em; text-transform: uppercase; opacity: .8;
-  }
-  .winner .nm { font-size: 34px; font-weight: 800; line-height: 1.15; margin: 5px 0 4px; letter-spacing: -.01em; }
-  .winner .sc { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .winner .sc span { opacity: .78; font-size: 13px; font-weight: 500; }
   .heroes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 620px) { .heroes { grid-template-columns: 1fr; } }
 
-  /* 문제 1등은 같은 골격에 색만 반전 — 조 1등이 주인공이라는 위계를 유지한다. */
-  .winner.alt {
-    background: var(--surface); color: var(--ink);
-    border: 2px solid var(--brand); padding: 22px 20px;
+  /* 두 카드는 같은 3행 격자 — 라벨·이름·점수 줄이 서로 어긋나지 않게 한다.
+     테두리 두께까지 같아야 안쪽 내용이 같은 자리에서 시작한다. */
+  .winner {
+    display: grid; grid-template-rows: auto 1fr auto; gap: 10px;
+    background: var(--brand); color: #fff;
+    border: 2px solid var(--brand); border-radius: var(--r);
+    padding: 20px; box-shadow: var(--shadow);
   }
+  .winner .k { font-size: 12px; font-weight: 700; letter-spacing: .06em; opacity: .85; }
+  .winner .nm {
+    font-size: 26px; font-weight: 800; line-height: 1.3; letter-spacing: -.01em;
+    align-self: center; word-break: keep-all;
+  }
+  .winner .sc { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .winner .sc span { font-size: 13px; font-weight: 500; opacity: .75; }
+  .winner.alt { background: var(--surface); color: var(--ink); }
   .winner.alt .k { color: var(--brand); opacity: 1; }
-  .winner.alt .nm { font-size: 22px; }
   .winner.alt .sc { color: var(--brand); }
   .winner.alt .sc span { color: var(--muted); opacity: 1; }
 
@@ -310,7 +309,6 @@
   .seclabel b { font-size: 15px; font-weight: 700; }
   .seclabel span { font-size: 12px; color: var(--muted); }
 
-  .rank-row.best { border-color: var(--brand); box-shadow: var(--shadow); }
   .rank { display: flex; flex-direction: column; gap: 8px; }
   .rank-row {
     display: grid; grid-template-columns: 24px 1fr auto; gap: 12px; align-items: center;
@@ -781,7 +779,7 @@
     }).join("");
 
     document.getElementById("probRank").innerHTML = plist.map(function (c) {
-      return '<div class="rank-row' + (c.rank === 1 ? " best" : "") + '" style="--tape:' + c.problem.tape + '">'
+      return '<div class="rank-row" style="--tape:' + c.problem.tape + '">'
         + '<div class="no">' + (c.rank === null ? "–" : c.rank) + "</div>"
         + '<div class="nm">' + esc(c.problem.name) + "</div>"
         + '<div class="score"><b>' + fmt(c.avg) + "</b><span> / 5</span></div></div>";
