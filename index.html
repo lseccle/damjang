@@ -95,9 +95,11 @@
   .howto[open] > summary { margin-bottom: 12px; }
   .howto .caret { display: none; margin-left: auto; color: var(--brand); font-size: 12px; }
   .howto[open] .caret { transform: rotate(180deg); }
-  @media (min-width: 641px) { .howto > summary { cursor: default; } }
+  /* 접혀 있으면 어느 폭에서든 펼칠 수 있는 표시가 보여야 한다 */
+  .howto:not([open]) .caret { display: inline-block; }
+  .howto > summary { cursor: pointer; }
   @media (max-width: 640px) {
-    .howto > summary { cursor: pointer; padding: 2px 0; }
+    .howto > summary { padding: 2px 0; }
     .howto .caret { display: inline-block; }
   }
   /* 각 단계를 display:contents 로 풀어 제목행·설명행을 세 칸이 공유하게 한다 —
