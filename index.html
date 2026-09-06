@@ -13,9 +13,11 @@
   img { max-width: 100%; }
   [hidden] { display: none !important; }
 </style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
   :root {
     --ground: #FAF6F1;
@@ -31,6 +33,7 @@
     --star-off: #DED5CE;
     --shadow: 0 1px 2px rgba(43,37,34,.05), 0 12px 28px rgba(122,36,25,.07);
     --r: 14px;
+    --font: "Pretendard Variable", Pretendard, "Noto Sans KR", system-ui, -apple-system, "Malgun Gothic", sans-serif;
     --tape-1: #C0392B;
     --tape-2: #D9963B;
     --tape-3: #6E8B4B;
@@ -63,7 +66,7 @@
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--ground); color: var(--ink);
-    font-family: "Noto Sans KR", system-ui, -apple-system, "Malgun Gothic", sans-serif;
+    font-family: var(--font);
     font-size: 15px; line-height: 1.6; -webkit-text-size-adjust: 100%;
   }
   .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 40px; }
@@ -71,22 +74,38 @@
   header.top { display: flex; align-items: flex-start; gap: 14px; padding: 26px 0 0; }
   header.top .ttl { flex: 1; }
   h1 {
-    font-family: "Outfit", "Noto Sans KR", sans-serif;
-    font-weight: 700; font-size: 26px; line-height: 1.25; letter-spacing: -.01em;
+    font-weight: 800; font-size: 26px; line-height: 1.25; letter-spacing: -.01em;
     margin: 0; color: var(--brand-deep); text-wrap: balance;
   }
+  h1 .ico { margin-right: 9px; font-size: 24px; vertical-align: 1px;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
   header.top .sub { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
 
   .howto {
     background: var(--soft); border: 1px solid rgba(192,57,43,.16);
-    border-radius: var(--r); padding: 14px 16px; margin-top: 18px;
+    border-radius: var(--r); padding: 16px 18px 18px; margin-top: 18px;
   }
   .howto h2 {
-    font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--brand-deep);
-    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; margin: 0 0 12px; color: var(--brand);
+    letter-spacing: .04em;
   }
-  .howto ol { margin: 0; padding-left: 17px; font-size: 13px; color: var(--brand-deep); line-height: 1.85; }
-  .howto b { font-weight: 700; }
+  .howto-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  }
+  .howto-step { display: grid; grid-template-columns: 22px 1fr; gap: 4px 9px; align-items: start; }
+  .howto-step .n {
+    grid-row: 1 / span 2;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--brand); color: #fff;
+    font-size: 12px; font-weight: 700; line-height: 22px; text-align: center;
+  }
+  .howto-step b { font-size: 14px; font-weight: 700; color: var(--brand-deep); align-self: center; }
+  .howto-step p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--brand-deep); opacity: .82; }
+  @media (max-width: 640px) {
+    .howto-grid { grid-template-columns: 1fr; gap: 13px; }
+    .howto-step + .howto-step { border-top: 1px solid rgba(192,57,43,.14); padding-top: 13px; }
+  }
 
   .steps { display: flex; gap: 8px; margin: 18px 0 0; flex-wrap: wrap; }
   .steps button {
@@ -97,7 +116,7 @@
     flex: 1; justify-content: center;
   }
   .steps button .n {
-    font-family: "Outfit", sans-serif; font-weight: 700; font-size: 12px;
+    font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums;
     width: 21px; height: 21px; border-radius: 50%; flex: none;
     display: inline-flex; align-items: center; justify-content: center;
     background: var(--line); color: var(--muted);
@@ -117,7 +136,7 @@
   /* 진행 */
   .counter { display: flex; align-items: center; gap: 14px; }
   .counter .big {
-    font-family: "Outfit", sans-serif; font-size: 30px; font-weight: 700; line-height: 1;
+    font-size: 30px; font-weight: 800; line-height: 1;
     color: var(--brand); font-variant-numeric: tabular-nums;
   }
   .counter .big small { font-size: 13px; color: var(--muted); font-weight: 500; }
@@ -132,7 +151,7 @@
     display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
     margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line-strong);
   }
-  .sheet-hd .no { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .sheet-hd .no { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 18px; color: var(--ink); }
   .sheet-hd .spacer { flex: 1; }
   .sheet-hd .cnt { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
@@ -159,7 +178,7 @@
   .counter .big input::-webkit-outer-spin-button, .counter .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .qrow .sbox {
     flex: none; width: 64px; height: 46px; text-align: center;
-    font-family: "Outfit", "Noto Sans KR", sans-serif; font-size: 20px; font-weight: 700;
+    font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums;
     color: var(--ink); background: var(--ground);
     border: 1.5px solid var(--line-strong); border-radius: 10px; padding: 0;
     -moz-appearance: textfield; caret-color: var(--brand);
@@ -171,8 +190,7 @@
   /* 지난 평가지 */
   .sheetchips { display: flex; flex-wrap: wrap; gap: 6px; }
   .sheetchips button {
-    appearance: none; cursor: pointer; font-family: "Outfit", "Noto Sans KR", sans-serif;
-    font-size: 13px; font-weight: 600; padding: 7px 11px; border-radius: 9px;
+    appearance: none; cursor: pointer; font-size: 13px; font-weight: 600; padding: 7px 11px; border-radius: 9px;
     background: var(--ground); border: 1px solid var(--line-strong); color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
@@ -210,11 +228,11 @@
     padding: 24px 22px; box-shadow: var(--shadow); position: relative; overflow: hidden;
   }
   .winner .k {
-    font-family: "Outfit", sans-serif; font-size: 12px; font-weight: 700;
+    font-size: 12px; font-weight: 700;
     letter-spacing: .18em; text-transform: uppercase; opacity: .8;
   }
-  .winner .nm { font-size: 34px; font-weight: 700; line-height: 1.15; margin: 5px 0 4px; }
-  .winner .sc { font-family: "Outfit", sans-serif; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .winner .nm { font-size: 34px; font-weight: 800; line-height: 1.15; margin: 5px 0 4px; letter-spacing: -.01em; }
+  .winner .sc { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .winner .sc span { opacity: .78; font-size: 13px; font-weight: 500; }
   .heroes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 620px) { .heroes { grid-template-columns: 1fr; } }
@@ -248,10 +266,10 @@
     background: var(--surface); border: 1px solid var(--line);
     border-left: 5px solid var(--tape); border-radius: var(--r); padding: 13px 15px;
   }
-  .rank-row .no { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rank-row .no { font-weight: 700; font-size: 18px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .rank-row .nm { font-weight: 700; }
   .rank-row .detail { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .rank-row .score b { font-family: "Outfit", sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .rank-row .score b { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .rank-row .score span { color: var(--muted); font-size: 12px; }
 
   details.more > summary { cursor: pointer; font-size: 14px; font-weight: 700; color: var(--muted); }
@@ -259,8 +277,8 @@
   .tbl-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  th { font-family: "Outfit", sans-serif; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: "Outfit", "Noto Sans KR", sans-serif; }
+  th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
   td .tapecell { display: inline-flex; align-items: center; gap: 7px; }
   td .tapecell i { width: 9px; height: 9px; border-radius: 2px; background: var(--tape); }
 
@@ -294,19 +312,31 @@
 <div class="wrap">
   <header class="top">
     <div class="ttl">
-      <h1>조별 루트 세팅 채점판</h1>
+      <h1><span class="ico" aria-hidden="true">🪛</span>조별 루트 세팅 채점판</h1>
       <p class="sub">5개 조 · 조당 2문제 · 5점 만점 (0.5점 단위)</p>
     </div>
   </header>
 
-  <div class="howto">
-    <h2>사용 방법 (3단계)</h2>
-    <ol>
-      <li><b>평가지 입력</b> — 종이 한 장을 보고 문제마다 점수를 칩니다. <b>0.5 ~ 5</b>, 반 점은 <b>4.5</b>처럼 소수점까지 치면 됩니다. 다음 숫자를 치면 자동으로 다음 칸으로 넘어가고, 빈 문제는 건너뜁니다.</li>
-      <li><b>저장하고 다음 장</b> — 누르면 화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣었으면 아래 <b>입력한 평가지</b>에서 번호를 눌러 다시 고칩니다.</li>
-      <li><b>결과</b> — 마지막 장을 넣는 순간 조 1등과 문제 1등이 나옵니다.</li>
+  <section class="howto" aria-label="사용 방법">
+    <h2>사용 방법</h2>
+    <ol class="howto-grid">
+      <li class="howto-step">
+        <span class="n">1</span>
+        <b>평가지 입력</b>
+        <p>종이 한 장을 보고 문제마다 점수를 칩니다. 0.5부터 5까지, 반 점은 4.5처럼 소수점까지 치면 됩니다. 빈 문제는 ↓ 로 건너뜁니다.</p>
+      </li>
+      <li class="howto-step">
+        <span class="n">2</span>
+        <b>저장하고 다음 장</b>
+        <p>누르면 화면이 비워져 바로 다음 장을 넣습니다. 잘못 넣은 장은 번호를 눌러 다시 고칠 수 있습니다.</p>
+      </li>
+      <li class="howto-step">
+        <span class="n">3</span>
+        <b>결과 확인</b>
+        <p>마지막 장을 넣는 순간 조 1등과 문제 1등이 나옵니다.</p>
+      </li>
     </ol>
-  </div>
+  </section>
 
   <nav class="steps" role="tablist">
     <button role="tab" data-tab="input" aria-selected="true"><span class="n">1</span>평가지 입력</button>
