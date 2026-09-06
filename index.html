@@ -221,10 +221,17 @@
   .qrow .qt { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; flex: 1; min-width: 110px; }
   .cardhead { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
   .cardhead .btn { flex: none; }
+  /* 목표 장수는 값이지 입력 폼이 아니다 — 점선 밑줄로만 "고칠 수 있음"을 알린다 */
   .counter .big input[type="number"] {
-    width: 54px; padding: 3px 6px; font-size: 13px; font-weight: 600; text-align: center;
-    border-radius: 7px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink);
-    -moz-appearance: textfield;
+    width: 2.6ch; padding: 0; margin: 0 1px;
+    font: inherit; font-size: 13px; font-weight: 600; text-align: center;
+    color: var(--muted); background: transparent;
+    border: 0; border-bottom: 1px dashed var(--line-strong); border-radius: 0;
+    font-variant-numeric: tabular-nums; -moz-appearance: textfield;
+  }
+  .counter .big input:hover { color: var(--ink); border-bottom-color: var(--brand); }
+  .counter .big input:focus {
+    outline: none; color: var(--brand); border-bottom: 1.5px solid var(--brand);
   }
   .counter .big input::-webkit-outer-spin-button, .counter .big input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .qrow .sbox {
