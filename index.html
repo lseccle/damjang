@@ -238,7 +238,8 @@
   .qrow .sbox:focus { outline: none; border-color: var(--brand); background: var(--soft); box-shadow: 0 0 0 3px rgba(192,57,43,.13); }
   .full-note {
     background: var(--soft); border: 1px solid rgba(192,57,43,.18); border-radius: 10px;
-    padding: 10px 12px; margin-bottom: 12px; color: var(--brand-deep); opacity: .9;
+    padding: 12px 14px; margin-bottom: 12px; color: var(--brand-deep);
+    font-weight: 700; opacity: 1;
   }
   .qrow .sbox:disabled { opacity: .5; }
   .qrow .sbox.filled { border-color: var(--brand); color: var(--brand); background: var(--surface); }
@@ -410,7 +411,7 @@
       </div>
 
       <div class="card">
-        <p class="hint full-note" id="fullNote" hidden><b>평가지 입력이 모두 완료되었습니다.</b> 결과를 확인해보세요.</p>
+        <p class="hint full-note" id="fullNote" hidden>평가지 입력이 모두 완료되었습니다. 결과를 확인해보세요.</p>
         <div class="sheet-hd">
           <span class="no" id="sheetNo">평가지 #1</span>
           <span class="spacer"></span>
@@ -648,7 +649,7 @@
     document.getElementById("cntMsg").textContent =
       done === 0 ? "첫 번째 평가지를 입력하세요."
       : done > target ? "목표 " + target + "장보다 " + (done - target) + "장 더 들어갔습니다. 확인해 주세요."
-      : done === target ? "다 들어왔습니다. 결과에서 1등 조를 확인하세요."
+      : done === target ? ""
       : (target - done) + "장 남았습니다.";
     document.querySelector(".counter .txt").classList.toggle("over", done > target);
   }
