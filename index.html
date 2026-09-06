@@ -118,10 +118,12 @@
     font-size: 12px; line-height: 1.6; color: var(--brand-deep);
     opacity: .72; word-break: keep-all;
   }
+  /* :nth-child 로 못박은 열 지정과 우선순위를 맞춰야 모바일에서 실제로 풀린다.
+     미디어 쿼리는 우선순위를 올려주지 않는다. */
   @media (max-width: 640px) {
-    .howto-grid { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 6px; }
-    .howto-step .hd, .howto-step p { grid-column: 1; grid-row: auto; }
-    .howto-step + .howto-step .hd { margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(192,57,43,.14); }
+    .howto-grid { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 4px; }
+    .howto-step:nth-child(n) .hd, .howto-step:nth-child(n) p { grid-column: 1; grid-row: auto; }
+    .howto-step + .howto-step .hd { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(192,57,43,.14); }
   }
 
   .steps { display: flex; gap: 8px; margin: 18px 0 0; flex-wrap: wrap; }
